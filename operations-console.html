@@ -323,10 +323,10 @@ document.addEventListener('DOMContentLoaded', async function() {
     frame.appendChild(ifr);
   }
 
-  /* ---------- embed the real mobile screenshot in the phone frame ---------- */
+  /* ---------- embed the real mobile screenshot, bezel-less, with a top chin ---------- */
   function embedPhone() {
-    var existing = document.querySelector('img[data-gs-phone]');
-    if (existing && existing.isConnected) return;
+    var w0 = document.querySelector('[data-gs-phonewrap]');
+    if (w0 && w0.isConnected) return;
     var cap = null, nodes = document.querySelectorAll('*');
     for (var i = 0; i < nodes.length; i++) {
       var el = nodes[i];
@@ -341,17 +341,18 @@ document.addEventListener('DOMContentLoaded', async function() {
       screen = screen.parentElement;
     }
     if (!screen) return;
-    while (screen.firstChild) screen.removeChild(screen.firstChild);
-    screen.style.aspectRatio = 'auto';
-    screen.style.background = 'var(--gs-ink)';
-    screen.style.display = 'block';
-    screen.style.padding = '16px 12px';
+    var frame = screen.parentElement || screen; // the design's hardware bezel — drop it entirely
+    var wrap = document.createElement('div');
+    wrap.setAttribute('data-gs-phonewrap', '1');
+    // bezel-less device: black rounded body, top chin so the header clears the rounded corners
+    wrap.style.cssText = 'width:280px;margin:0 auto;background:#000;border-radius:30px;overflow:hidden;padding-top:14px;box-shadow:0 26px 55px rgba(0,0,0,0.34);';
     var img = document.createElement('img');
     img.setAttribute('data-gs-phone', '1');
     img.src = 'mobile-route-preview.png';
     img.alt = 'GroundSwell mobile route preview';
-    img.style.cssText = 'display:block;width:100%;height:auto;border:0;border-radius:14px;';
-    screen.appendChild(img);
+    img.style.cssText = 'display:block;width:100%;height:auto;border:0;';
+    wrap.appendChild(img);
+    frame.replaceWith(wrap);
   }
 
   function tick() {
