@@ -343,13 +343,14 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (!screen) return;
     while (screen.firstChild) screen.removeChild(screen.firstChild);
     screen.style.aspectRatio = 'auto';
-    screen.style.background = 'none';
+    screen.style.background = 'var(--gs-ink)';
     screen.style.display = 'block';
+    screen.style.padding = '16px 12px';
     var img = document.createElement('img');
     img.setAttribute('data-gs-phone', '1');
     img.src = 'mobile-route-preview.png';
     img.alt = 'GroundSwell mobile route preview';
-    img.style.cssText = 'display:block;width:100%;height:auto;border:0;';
+    img.style.cssText = 'display:block;width:100%;height:auto;border:0;border-radius:14px;';
     screen.appendChild(img);
   }
 
