@@ -380,15 +380,10 @@ document.addEventListener('DOMContentLoaded', async function() {
     p.style.cssText = 'margin:16px 0 22px;font-size:16px;line-height:1.55;color:var(--text-strong);flex:1;';
     card.appendChild(p);
     var f = document.createElement('div');
-    f.style.cssText = 'display:flex;align-items:center;gap:13px;padding-top:16px;border-top:1px solid var(--border-hairline);';
-    var av = document.createElement('div');
-    av.textContent = initials(t.name);
-    av.style.cssText = 'width:42px;height:42px;border-radius:50%;background:var(--warm-150,#ece3d3);color:var(--gs-slate,#4a4540);display:grid;place-items:center;flex:none;font-family:var(--font-display);font-weight:700;font-size:14px;';
-    var col = document.createElement('div'); col.style.minWidth = '0';
+    f.style.cssText = 'padding-top:16px;border-top:1px solid var(--border-hairline);';
     var nm = document.createElement('div'); nm.textContent = t.name; nm.style.cssText = 'font-weight:600;font-size:15px;color:var(--text-strong);';
-    var rl = document.createElement('div'); rl.textContent = t.role; rl.style.cssText = 'font-family:var(--font-mono);font-size:11px;color:var(--text-muted);letter-spacing:0.01em;margin-top:3px;line-height:1.45;';
-    col.appendChild(nm); col.appendChild(rl);
-    f.appendChild(av); f.appendChild(col);
+    var rl = document.createElement('div'); rl.textContent = t.role; rl.style.cssText = 'font-family:var(--font-mono);font-size:11px;color:var(--text-muted);letter-spacing:0.01em;margin-top:4px;line-height:1.45;';
+    f.appendChild(nm); f.appendChild(rl);
     card.appendChild(f);
     return card;
   }
@@ -405,6 +400,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     while (grid && getComputedStyle(grid).display !== 'grid') grid = grid.parentElement;
     if (!grid) return;
     var iconNode = grid.querySelector('svg');
+    if (!iconNode) return; // wait for the page to render the quote icon before stamping cards
     while (grid.firstChild) grid.removeChild(grid.firstChild);
     grid.setAttribute('data-gs-tcards', '1');
     for (var j = 0; j < TESTIMONIALS.length; j++) grid.appendChild(buildCard(TESTIMONIALS[j], iconNode));
