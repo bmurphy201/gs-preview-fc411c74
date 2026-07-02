@@ -587,6 +587,145 @@ document.addEventListener('DOMContentLoaded', async function() {
     content.addEventListener('pointerup', function (e) { if (sx === null) return; var dx = e.clientX - sx; if (Math.abs(dx) > 40) { go(idx + (dx < 0 ? 1 : -1)); resetTimer(); } sx = null; });
     renderD(); resetTimer();
   }
+  /* ---------- new product section: GroundSwell Agent ---------- */
+  var GS_SCHED = 'https://risingtide.us/scheduling';
+  function gsIcon(kind, size, color) {
+    var NS = 'http://www.w3.org/2000/svg';
+    var s = document.createElementNS(NS, 'svg');
+    s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('width', size); s.setAttribute('height', size);
+    s.setAttribute('stroke-linecap', 'round'); s.setAttribute('stroke-linejoin', 'round');
+    s.style.cssText = 'flex:none;display:block;';
+    function add(tag, attrs) { var e = document.createElementNS(NS, tag); for (var k in attrs) e.setAttribute(k, attrs[k]); s.appendChild(e); }
+    if (kind === 'check') { s.setAttribute('fill', 'none'); s.setAttribute('stroke', color); s.setAttribute('stroke-width', '2.5'); add('path', { d: 'M20 6 9 17l-5-5' }); }
+    else if (kind === 'play') { s.setAttribute('fill', color); s.setAttribute('stroke', 'none'); add('path', { d: 'M8 5v14l11-7z' }); }
+    else if (kind === 'arrow') { s.setAttribute('fill', 'none'); s.setAttribute('stroke', color); s.setAttribute('stroke-width', '2'); add('line', { x1: 5, y1: 12, x2: 19, y2: 12 }); add('path', { d: 'M12 5l7 7-7 7' }); }
+    return s;
+  }
+  function el(tag, css, text) { var e = document.createElement(tag); if (css) e.style.cssText = css; if (text != null) e.textContent = text; return e; }
+
+  function buildAgentSection() {
+    var sec = document.createElement('section');
+    sec.className = 'gs-section';
+    sec.setAttribute('data-gs-agent', '1');
+    sec.style.cssText = 'background:var(--bg-page);padding-top:120px;padding-bottom:120px;border-top:1px solid var(--border-hairline);';
+    var wrap = document.createElement('div'); wrap.className = 'gs-container';
+    sec.appendChild(wrap);
+
+    // --- header ---
+    var head = el('div', 'max-width:660px;');
+    var h1 = document.createElement('h2'); h1.className = 'gs-h1';
+    h1.appendChild(document.createTextNode('From Insight to '));
+    var exSpan = document.createElement('span'); exSpan.className = 'gs-gradient-text'; exSpan.textContent = 'Execution.';
+    h1.appendChild(exSpan);
+    var lede = el('p', null, 'Most software tells you what happened. The GroundSwell Agent tells you what to do next, turning your operation’s data into faster decisions and sharper execution.');
+    lede.className = 'gs-lede'; lede.style.marginTop = '22px'; lede.style.maxWidth = '560px';
+    head.appendChild(h1); head.appendChild(lede);
+    wrap.appendChild(head);
+
+    // --- video placeholder ---
+    var video = el('div', 'position:relative;margin-top:52px;border:1px solid var(--ink-600);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-md);aspect-ratio:16 / 9;background:var(--gs-ink);');
+    var badge = el('div', 'position:absolute;top:18px;left:20px;display:flex;align-items:center;gap:9px;z-index:2;');
+    badge.appendChild(el('span', 'width:8px;height:8px;border-radius:50%;background:var(--gs-coral);flex:none;'));
+    badge.appendChild(el('span', 'font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-on-dark-muted);', 'GroundSwell Agent · Live Demo'));
+    var center = el('div', 'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;');
+    var play = el('span', 'width:64px;height:64px;border-radius:50%;background:var(--grad-energy);display:grid;place-items:center;box-shadow:var(--shadow-accent);');
+    var playIcon = gsIcon('play', 24, '#fff'); playIcon.style.marginLeft = '3px';
+    play.appendChild(playIcon);
+    var vcap = el('span', 'font-family:var(--font-mono);font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-on-dark-muted);', 'Live agent walkthrough');
+    center.appendChild(play); center.appendChild(vcap);
+    video.appendChild(badge); video.appendChild(center);
+    wrap.appendChild(video);
+
+    // --- features (left) + stat cards (right) ---
+    var cols = el('div', 'display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start;margin-top:88px;');
+    cols.className = 'gs-cols2';
+
+    var left = document.createElement('div');
+    var h2 = document.createElement('h3'); h2.className = 'gs-h2'; h2.style.fontSize = '34px';
+    h2.appendChild(document.createTextNode('Real-Time Intelligence. '));
+    var g2 = document.createElement('span'); g2.className = 'gs-gradient-text'; g2.textContent = 'Actionable Guidance. Smarter Execution.';
+    h2.appendChild(g2);
+    left.appendChild(h2);
+    var ul = el('ul', 'list-style:none;margin:24px 0 0;padding:0;');
+    var BULLETS = [
+      ['Protects your 10:30 commitments.', 'Flags risk before it becomes a missed window.'],
+      ['Recommends fixes in real time.', 'Routing adjustments as conditions change, not after the fact.'],
+      ['Answers in plain English.', 'Speaks your language: CSAs, routes, dispatch, and service levels.'],
+      ['Eliminates unnecessary miles.', 'Surfaces hidden inefficiencies that are nearly impossible to catch by hand.'],
+      ['Included at no extra cost.', 'Runs 24/7 alongside Nightly Dispatch and Infinite Loop, automatically.']
+    ];
+    BULLETS.forEach(function (b) {
+      var li = el('li', 'display:flex;gap:14px;align-items:flex-start;padding:14px 0;border-top:1px solid var(--border-hairline);');
+      var ic = gsIcon('check', 18, 'var(--gs-amaranth)'); ic.style.marginTop = '3px';
+      var span = el('span', 'font-size:16px;line-height:1.55;color:var(--text-body);');
+      span.appendChild(el('strong', 'color:var(--text-strong);font-weight:600;', b[0]));
+      span.appendChild(document.createTextNode(' ' + b[1]));
+      li.appendChild(ic); li.appendChild(span); ul.appendChild(li);
+    });
+    left.appendChild(ul);
+
+    var right = el('div', 'display:flex;flex-direction:column;gap:16px;');
+    var CARDS = [
+      ['24/7', 'Monitors your operation continuously. Never clocks out.'],
+      ['Seconds', 'Answers and recommendations, not hours buried in reports.'],
+      ['$0', 'Included with your subscription. No add-on cost.']
+    ];
+    CARDS.forEach(function (c) {
+      var card = el('div', 'background:var(--surface-card);border:1px solid var(--border-hairline);border-radius:var(--radius-md);padding:30px 32px;');
+      var num = el('div', 'font-family:var(--font-display);font-weight:800;font-size:44px;line-height:1;letter-spacing:-0.01em;color:transparent;background:var(--grad-energy);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;', c[0]);
+      var lbl = el('div', 'margin-top:12px;font-size:15px;line-height:1.5;color:var(--text-muted);', c[1]);
+      card.appendChild(num); card.appendChild(lbl); right.appendChild(card);
+    });
+
+    cols.appendChild(left); cols.appendChild(right);
+    wrap.appendChild(cols);
+
+    // --- result bar ---
+    var result = el('div', 'display:flex;align-items:center;gap:22px;background:var(--gs-ink);border-radius:var(--radius-sm);padding:24px 30px;margin-top:56px;');
+    result.appendChild(el('span', 'font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gs-coral);flex:none;', 'Result'));
+    result.appendChild(el('span', 'width:1px;align-self:stretch;background:var(--ink-600);flex:none;'));
+    var rtext = el('span', 'font-size:17px;line-height:1.5;color:var(--text-on-dark);');
+    rtext.appendChild(document.createTextNode('Your team stops reacting and starts executing. '));
+    rtext.appendChild(el('strong', 'font-weight:600;', 'Operational intelligence. Real-world execution.'));
+    result.appendChild(rtext);
+    wrap.appendChild(result);
+
+    // --- closing CTA (heading left, button right) ---
+    var cta = el('div', 'display:grid;grid-template-columns:1.2fr 0.8fr;gap:48px;align-items:center;margin-top:80px;');
+    cta.className = 'gs-cols2';
+    var ctaLeft = document.createElement('div');
+    var h3 = document.createElement('h2'); h3.className = 'gs-h1'; h3.style.fontSize = '46px';
+    h3.appendChild(document.createTextNode('Operational Intelligence. '));
+    var g3 = document.createElement('span'); g3.className = 'gs-gradient-text'; g3.textContent = 'Real-World Execution.';
+    h3.appendChild(g3);
+    var ctaLede = el('p', null, 'More than AI. It’s an operations partner that turns your data into clear guidance, so your team stays ahead and executes with confidence.');
+    ctaLede.className = 'gs-lede'; ctaLede.style.marginTop = '18px'; ctaLede.style.fontSize = '18px';
+    ctaLeft.appendChild(h3); ctaLeft.appendChild(ctaLede);
+    var ctaRight = el('div', 'display:flex;justify-content:flex-end;');
+    var btn = document.createElement('a');
+    btn.href = GS_SCHED; btn.target = '_blank'; btn.rel = 'noopener noreferrer';
+    btn.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;gap:10px;height:58px;padding:0 34px;font-family:var(--font-body);font-weight:600;font-size:17px;letter-spacing:0.01em;color:#fff;text-decoration:none;white-space:nowrap;background:var(--grad-energy);border-radius:var(--radius-md);box-shadow:var(--shadow-accent);transition:transform 150ms,filter 150ms,box-shadow 150ms;';
+    btn.appendChild(document.createTextNode('See the Agent in Action'));
+    btn.appendChild(gsIcon('arrow', 18, '#fff'));
+    btn.addEventListener('mouseenter', function () { btn.style.transform = 'translateY(-2px)'; btn.style.filter = 'brightness(1.06)'; });
+    btn.addEventListener('mouseleave', function () { btn.style.transform = 'translateY(0)'; btn.style.filter = 'none'; });
+    ctaRight.appendChild(btn);
+    cta.appendChild(ctaLeft); cta.appendChild(ctaRight);
+    wrap.appendChild(cta);
+
+    return sec;
+  }
+  function embedAgentSection() {
+    var e = document.querySelector('[data-gs-agent]');
+    if (e && e.isConnected) return;
+    var h = null, hs = document.querySelectorAll('h2');
+    for (var i = 0; i < hs.length; i++) { if ((hs[i].textContent || '').indexOf('Two Tools') === 0) { h = hs[i]; break; } }
+    if (!h) return;
+    var productsSection = h.closest('section');
+    if (!productsSection || !productsSection.parentElement) return;
+    productsSection.parentElement.insertBefore(buildAgentSection(), productsSection.nextSibling);
+  }
+
 
 
   function tick() {
@@ -599,6 +738,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     embedVideo();
     embedCarousel();
     embedDesktopCarousel();
+    embedAgentSection();
     embedTestimonials();
     if (ticks > 120) clearInterval(iv); // ~18s of insurance against re-render
   }
