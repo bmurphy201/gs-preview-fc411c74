@@ -267,16 +267,22 @@ document.addEventListener('DOMContentLoaded', async function() {
   /* ---------- copy edits (text-node level; idempotent) ---------- */
   var EDITS = [
     ['\\u2019', '’'],
-    ['No slides.', 'No generics and sales pitches.'],
     ['Groundswell rebalances in seconds', 'Groundswell automatically rebalances in seconds'],
     ['Automated dispatch, mid-route revenue capture.', 'Automated dispatch captures missed efficiencies, producing fewer routes needed.'],
     ['nearly 40% of the time', 'almost half of the dispatches'],
     ['Runs after the planning window closes.', 'GroundSwell reads the terminal data.'],
     ['$2,000/month per CSA. You pay for what you use', 'Pricing based on your CSA. We benefit together.'],
-    ['One Plan. Per CSA.', 'One Plan. Personalized.']
+    ['One Plan. Per CSA.', 'CSA-Based Pricing.'],
+    ['What if my dispatchers don’t pick it up quickly?', 'What if my BC/Manager doesn’t pick it up quickly?']
   ];
   var SET_NODE = [
-    ['About a week to be fully implemented', 'The actual onboarding process is done within a day. Then the system iterates and you teach it within the first week. This is not a project.']
+    ['Forecast data is wrong', 'Forecasts are only estimates. GroundSwell automatically rebuilds your operation using the most accurate package data available. Reducing unnecessary routes, lowering operating costs, and improving efficiency all before the day begins.'],
+    ['We pull your actual routing data', 'See GroundSwell in action with your own operation. We use your actual routing data to configure the platform during your demo, giving you a real-world view of how it works for your business.'],
+    ['Your dispatcher stops managing the day manually', 'Your manager stops managing the day manually. The operation adjusts itself, and you see margin move in real time.'],
+    ['About a week to be fully implemented', 'Go live in as little as one week. We complete your initial configuration together during your kickoff call, so you’re up and running quickly, without the delays of a traditional software implementation.'],
+    ['Directly. No manual exports', 'Directly, by automatically importing operational data and syncing optimized routes back to your existing systems. No manual exports. No duplicate entry. Just seamless automation from start to finish.'],
+    ['If your dispatcher can run your current routing tools', 'If they can run your current routing tools, they can run Groundswell on day one. We built it for contractors, not IT departments. Two onboarding sessions are included, with additional training and support available whenever your team needs it.'],
+    ['ISP contractors who want to stop staffing for volume', 'ISP contractors who want to stop staffing for volume that never shows up. If your BCs are rebuilding routes every night and managing the day to day manually, Groundswell was built for your operation.']
   ];
   function applyTextEdits() {
     var w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
@@ -622,19 +628,38 @@ document.addEventListener('DOMContentLoaded', async function() {
     head.appendChild(h1); head.appendChild(lede);
     wrap.appendChild(head);
 
-    // --- video placeholder ---
-    var video = el('div', 'position:relative;margin-top:52px;border:1px solid var(--ink-600);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-md);aspect-ratio:16 / 9;background:var(--gs-ink);');
-    var badge = el('div', 'position:absolute;top:18px;left:20px;display:flex;align-items:center;gap:9px;z-index:2;');
-    badge.appendChild(el('span', 'width:8px;height:8px;border-radius:50%;background:var(--gs-coral);flex:none;'));
-    badge.appendChild(el('span', 'font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-on-dark-muted);', 'GroundSwell Agent · Live Demo'));
-    var center = el('div', 'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;');
-    var play = el('span', 'width:64px;height:64px;border-radius:50%;background:var(--grad-energy);display:grid;place-items:center;box-shadow:var(--shadow-accent);');
-    var playIcon = gsIcon('play', 24, '#fff'); playIcon.style.marginLeft = '3px';
-    play.appendChild(playIcon);
-    var vcap = el('span', 'font-family:var(--font-mono);font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-on-dark-muted);', 'Live agent walkthrough');
-    center.appendChild(play); center.appendChild(vcap);
-    video.appendChild(badge); video.appendChild(center);
-    wrap.appendChild(video);
+    // --- live agent chat ---
+    var chat = el('div', 'margin-top:52px;border:1px solid #2c3b6b;border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-md);background:#141f42;');
+    var chead = el('div', 'display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #2c3b6b;');
+    var hleft = el('div', 'display:flex;align-items:center;gap:9px;');
+    hleft.appendChild(el('span', 'width:8px;height:8px;border-radius:50%;background:#5b7fd6;flex:none;box-shadow:0 0 8px rgba(91,127,214,0.8);'));
+    hleft.appendChild(el('span', 'font-family:var(--font-mono);font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:#8ea3d6;', 'GroundSwell Agent · Live'));
+    chead.appendChild(hleft);
+    chead.appendChild(el('span', 'font-family:var(--font-mono);font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:#5b6aa0;', 'Now'));
+    chat.appendChild(chead);
+    var cbody = el('div', 'padding:26px 24px;display:flex;flex-direction:column;gap:20px;');
+    var MSGS = [
+      ['Agent', true, 'Route 3 is trending tight. A time-critical commitment is at risk, running 14 minutes behind pace. Recommend pulling 3 stops and merging into Route 7.'],
+      ['Operator', false, 'Do it. What’s the margin impact?'],
+      ['Agent', true, 'Route 3 improves to +$112 margin. Route 7 stays positive at +$287. Commitment protected. Rebalance applied automatically.'],
+      ['Operator', false, 'Any other flags?'],
+      ['Agent', true, 'Route 9 is running 8 unnecessary miles. Suggest re-sequencing stops 14 to 19. Saves ~$34 today and ~$700/month if persistent.']
+    ];
+    MSGS.forEach(function (m) {
+      var mrow = el('div', '');
+      mrow.appendChild(el('div', 'font-family:var(--font-mono);font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:' + (m[1] ? '#7f9ee0' : '#6b7aa8') + ';margin-bottom:8px;', m[0]));
+      var bubble = el('div', m[1]
+        ? 'background:#22315f;border:1px solid #34457a;border-radius:12px;padding:15px 20px;font-size:16px;line-height:1.55;color:#e8edf9;'
+        : 'background:rgba(255,255,255,0.02);border:1px solid #2c3b6b;border-radius:12px;padding:15px 20px;font-size:16px;line-height:1.55;color:#aeb9d8;', m[2]);
+      mrow.appendChild(bubble);
+      cbody.appendChild(mrow);
+    });
+    chat.appendChild(cbody);
+    var cfoot = el('div', 'display:flex;align-items:center;gap:9px;padding:15px 22px;border-top:1px solid #2c3b6b;');
+    cfoot.appendChild(el('span', 'width:8px;height:8px;border-radius:50%;background:#4ecb7a;flex:none;box-shadow:0 0 8px rgba(78,203,122,0.8);'));
+    cfoot.appendChild(el('span', 'font-family:var(--font-mono);font-size:12px;letter-spacing:0.06em;color:#8290bb;', 'Monitoring all active routes · 2 flags resolved today'));
+    chat.appendChild(cfoot);
+    wrap.appendChild(chat);
 
     // --- features (left) + stat cards (right) ---
     var cols = el('div', 'display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start;margin-top:88px;');
@@ -725,6 +750,55 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (!productsSection || !productsSection.parentElement) return;
     productsSection.parentElement.insertBefore(buildAgentSection(), productsSection.nextSibling);
   }
+  /* ---------- pricing: remove the $2,000 price block ---------- */
+  function removePriceBlock() {
+    var spans = document.querySelectorAll('span');
+    for (var i = 0; i < spans.length; i++) {
+      var sp = spans[i];
+      if (sp.children.length === 0 && sp.textContent.trim() === '$2,000') {
+        var row = sp.parentElement;
+        if (row && !row.getAttribute('data-gs-noprice')) { row.style.display = 'none'; row.setAttribute('data-gs-noprice', '1'); }
+        return;
+      }
+    }
+  }
+
+  /* ---------- veteran block: add nonprofit link cards ---------- */
+  function addNonprofitCards() {
+    var d = document.querySelector('[data-gs-nonprofits]');
+    if (d && d.isConnected) return;
+    var disc = null, ps = document.querySelectorAll('p');
+    for (var i = 0; i < ps.length; i++) { if ((ps[i].textContent || '').trim().indexOf('We make the donation in your name') === 0) { disc = ps[i]; break; } }
+    if (!disc) return;
+    var grid = el('div', 'display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:22px;');
+    grid.setAttribute('data-gs-nonprofits', '1');
+    [['Waypoint Vets', 'waypointvets.org', 'https://waypointvets.org'], ['Tunnel to Towers', 't2t.org', 'https://t2t.org']].forEach(function (c) {
+      var a = document.createElement('a'); a.href = c[2]; a.target = '_blank'; a.rel = 'noopener noreferrer';
+      a.style.cssText = 'display:block;text-decoration:none;background:rgba(255,255,255,0.03);border:1px solid var(--ink-600);border-radius:var(--radius-sm);padding:16px 18px;transition:border-color .15s,background .15s;';
+      a.addEventListener('mouseenter', function () { a.style.borderColor = 'var(--gs-coral)'; a.style.background = 'rgba(255,255,255,0.05)'; });
+      a.addEventListener('mouseleave', function () { a.style.borderColor = 'var(--ink-600)'; a.style.background = 'rgba(255,255,255,0.03)'; });
+      a.appendChild(el('div', 'font-weight:600;font-size:15px;color:var(--text-on-dark);', c[0]));
+      var link = el('div', 'margin-top:6px;font-family:var(--font-mono);font-size:12px;color:var(--gs-coral);display:flex;align-items:center;gap:5px;');
+      link.appendChild(document.createTextNode(c[1]));
+      var arr = gsIcon('arrow', 12, 'var(--gs-coral)'); arr.style.transform = 'rotate(-45deg)';
+      link.appendChild(arr);
+      a.appendChild(link);
+      grid.appendChild(a);
+    });
+    disc.parentElement.insertBefore(grid, disc.nextSibling);
+  }
+
+  /* ---------- hero: add the tagline line under the lede ---------- */
+  function addHeroTagline() {
+    var t = document.querySelector('[data-gs-herotag]');
+    if (t && t.isConnected) return;
+    var lede = document.querySelector('.gs-lede');
+    if (!lede) return;
+    var tag = el('p', 'margin-top:20px;font-family:var(--font-display);font-weight:700;font-size:17px;letter-spacing:0.01em;color:var(--gs-coral);', 'Smarter Data. Smarter Routes. Better Results.');
+    tag.setAttribute('data-gs-herotag', '1');
+    lede.parentElement.insertBefore(tag, lede.nextSibling);
+  }
+
 
 
 
@@ -739,6 +813,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     embedCarousel();
     embedDesktopCarousel();
     embedAgentSection();
+    removePriceBlock();
+    addNonprofitCards();
+    addHeroTagline();
     embedTestimonials();
     if (ticks > 120) clearInterval(iv); // ~18s of insurance against re-render
   }
