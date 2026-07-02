@@ -247,17 +247,19 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
   }
 
-  /* ---------- remove IBM Plex Mono dotted zeros on the big stat numbers ---------- */
-  function applyZeroFix() {
+  /* ---------- big stat numbers: swap to a plain-zero font (no dotted zero) ---------- */
+  function applyStatFont() {
     var els = document.querySelectorAll('div, span');
     for (var i = 0; i < els.length; i++) {
       var el = els[i];
-      if (el.getAttribute('data-gs-zero')) continue;
+      if (el.getAttribute('data-gs-statfont')) continue;
       var cs = getComputedStyle(el);
       var fs = parseFloat(cs.fontSize) || 0;
       if (fs >= 40 && /Plex Mono/i.test(cs.fontFamily)) {
-        el.style.fontFeatureSettings = '"cv01" 1';
-        el.setAttribute('data-gs-zero', '1');
+        el.style.fontFamily = "'IBM Plex Sans', -apple-system, system-ui, sans-serif";
+        el.style.fontWeight = '700';
+        el.style.letterSpacing = '-0.02em';
+        el.setAttribute('data-gs-statfont', '1');
       }
     }
   }
@@ -472,15 +474,131 @@ document.addEventListener('DOMContentLoaded', async function() {
       if ((ps[k].textContent || '').indexOf('Cards hold photo') !== -1) ps[k].style.display = 'none';
     }
   }
+  /* ---------- fix the CSS flag: fit the star grid inside the blue canton ---------- */
+  function applyFlagFix() {
+    var els = document.querySelectorAll('div');
+    for (var i = 0; i < els.length; i++) {
+      var el = els[i];
+      if (el.getAttribute('data-gs-flag')) continue;
+      if (getComputedStyle(el).display !== 'grid') continue;
+      var m = getComputedStyle(el).backgroundColor.match(/\d+/g);
+      if (!m || m.length < 3) continue;
+      var r = +m[0], g = +m[1], b = +m[2];
+      if (b > 55 && b < 120 && r < 80 && b >= g && b > r) { // dark navy canton
+        el.style.overflow = 'hidden';
+        el.style.alignContent = 'center';
+        var stars = el.children;
+        for (var k = 0; k < stars.length; k++) { stars[k].style.width = '72%'; stars[k].style.height = 'auto'; }
+        el.setAttribute('data-gs-flag', '1');
+      }
+    }
+  }
+
+  /* ---------- desktop app screenshots: browser-window carousel ---------- */
+  var DSLIDES = [
+    { src: 'dslide-1.jpg', cap: "The whole day's routes, built and mapped" },
+    { src: 'dslide-2.jpg', cap: 'Utilization, miles, and load per route' },
+    { src: 'dslide-3.jpg', cap: 'Every stop, down to the address' },
+    { src: 'dslide-4.jpg', cap: 'Ask the assistant, get a straight answer' }
+  ];
+  function embedDesktopCarousel() {
+    var w0 = document.querySelector('[data-gs-dcarousel]');
+    if (w0 && w0.isConnected) return;
+    var cap = null, nodes = document.querySelectorAll('*');
+    for (var i = 0; i < nodes.length; i++) {
+      var el = nodes[i];
+      var t = (el.textContent || '').trim();
+      if (el.children.length === 0 && t.indexOf('Nightly Automated Dispatch') === 0 && /desktop/i.test(t)) { cap = el; break; }
+    }
+    if (!cap) return;
+    var contentDiv = cap;
+    for (var j = 0; j < 6 && contentDiv; j++) {
+      var ar = (getComputedStyle(contentDiv).aspectRatio || '').replace(/\s/g, '');
+      if (ar === '16/10') break;
+      contentDiv = contentDiv.parentElement;
+    }
+    if (!contentDiv) return;
+    var frameOuter = contentDiv.parentElement;
+    if (!frameOuter) return;
+
+    var root = document.createElement('div');
+    root.setAttribute('data-gs-dcarousel', '1');
+
+    // self-built browser window (own chrome, so React re-renders can't revert it)
+    var win = document.createElement('div');
+    win.style.cssText = 'border:1px solid var(--border-strong,#d8cdb8);border-radius:12px;overflow:hidden;box-shadow:var(--shadow-md,0 12px 34px rgba(0,0,0,0.14));background:var(--warm-0,#fff);';
+    var bar = document.createElement('div');
+    bar.style.cssText = 'display:flex;align-items:center;gap:7px;padding:11px 14px;border-bottom:1px solid var(--border-hairline,#e7ddcd);background:var(--bg-sunken,#f2ece1);';
+    for (var dd = 0; dd < 3; dd++) { var dot = document.createElement('span'); dot.style.cssText = 'width:11px;height:11px;border-radius:50%;background:var(--warm-300,#d8cdb8);flex:none;'; bar.appendChild(dot); }
+    var url = document.createElement('span'); url.textContent = 'app.groundswell.fx'; url.style.cssText = 'margin-left:12px;font-family:var(--font-mono);font-size:11.5px;color:var(--text-faint,#9a8f7d);';
+    bar.appendChild(url);
+    var content = document.createElement('div');
+    content.style.cssText = 'position:relative;overflow:hidden;background:#0b1420;touch-action:pan-y;';
+    var track = document.createElement('div');
+    track.style.cssText = 'display:flex;width:100%;transition:transform .45s cubic-bezier(.4,0,.2,1);will-change:transform;';
+    DSLIDES.forEach(function (s) {
+      var slide = document.createElement('div');
+      slide.style.cssText = 'flex:0 0 100%;width:100%;';
+      var img = document.createElement('img');
+      img.src = s.src; img.alt = 'GroundSwell desktop app'; img.draggable = false;
+      img.style.cssText = 'display:block;width:100%;height:auto;border:0;-webkit-user-drag:none;';
+      slide.appendChild(img); track.appendChild(slide);
+    });
+    content.appendChild(track);
+    win.appendChild(bar); win.appendChild(content);
+
+    var ctrls = document.createElement('div');
+    ctrls.style.cssText = 'margin-top:16px;';
+    var capEl = document.createElement('div');
+    capEl.style.cssText = 'text-align:center;font-size:14.5px;line-height:1.4;color:var(--text-muted,#6b6358);min-height:22px;font-family:var(--font-body);';
+    var rowc = document.createElement('div');
+    rowc.style.cssText = 'margin-top:8px;display:flex;align-items:center;justify-content:center;gap:16px;';
+    function arrow(label, aria) {
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = label; b.setAttribute('aria-label', aria);
+      b.style.cssText = 'width:40px;height:40px;flex:none;border-radius:50%;border:1px solid var(--border-strong,#d8cdb8);background:var(--surface-card,#fff);color:var(--text-strong,#1b1813);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:background .15s,border-color .15s;';
+      b.addEventListener('mouseenter', function () { b.style.background = 'var(--bg-sunken,#f2ece1)'; b.style.borderColor = 'var(--gs-coral,#d63348)'; });
+      b.addEventListener('mouseleave', function () { b.style.background = 'var(--surface-card,#fff)'; b.style.borderColor = 'var(--border-strong,#d8cdb8)'; });
+      return b;
+    }
+    var prev = arrow('❮', 'Previous screen'), next = arrow('❯', 'Next screen');
+    var dotsWrap = document.createElement('div'); dotsWrap.style.cssText = 'display:flex;align-items:center;gap:9px;';
+    var dotEls = DSLIDES.map(function (_, i) { var d = document.createElement('button'); d.type = 'button'; d.setAttribute('aria-label', 'Screen ' + (i + 1)); d.style.cssText = 'width:9px;height:9px;border-radius:50%;border:0;padding:0;cursor:pointer;background:var(--warm-300,#d8cdb8);transition:background .2s,transform .2s;'; dotsWrap.appendChild(d); return d; });
+    rowc.appendChild(prev); rowc.appendChild(dotsWrap); rowc.appendChild(next);
+    ctrls.appendChild(capEl); ctrls.appendChild(rowc);
+
+    root.appendChild(win); root.appendChild(ctrls);
+    frameOuter.replaceWith(root);
+
+    var idx = 0, timer = null;
+    function renderD() {
+      track.style.transform = 'translateX(-' + (idx * 100) + '%)';
+      capEl.textContent = DSLIDES[idx].cap;
+      dotEls.forEach(function (d, i) { if (i === idx) { d.style.background = 'var(--gs-coral,#d63348)'; d.style.transform = 'scale(1.3)'; } else { d.style.background = 'var(--warm-300,#d8cdb8)'; d.style.transform = 'none'; } });
+    }
+    function go(n) { idx = (n + DSLIDES.length) % DSLIDES.length; renderD(); }
+    function resetTimer() { if (timer) clearInterval(timer); timer = setInterval(function () { go(idx + 1); }, 6000); }
+    prev.addEventListener('click', function () { go(idx - 1); resetTimer(); });
+    next.addEventListener('click', function () { go(idx + 1); resetTimer(); });
+    dotEls.forEach(function (d, i) { d.addEventListener('click', function () { go(i); resetTimer(); }); });
+    root.addEventListener('mouseenter', function () { if (timer) { clearInterval(timer); timer = null; } });
+    root.addEventListener('mouseleave', function () { resetTimer(); });
+    var sx = null;
+    content.addEventListener('pointerdown', function (e) { sx = e.clientX; });
+    content.addEventListener('pointerup', function (e) { if (sx === null) return; var dx = e.clientX - sx; if (Math.abs(dx) > 40) { go(idx + (dx < 0 ? 1 : -1)); resetTimer(); } sx = null; });
+    renderD(); resetTimer();
+  }
+
 
   function tick() {
     ticks++;
     swapLogos();
     hideScaffolding();
-    applyZeroFix();
+    applyStatFont();
+    applyFlagFix();
     applyTextEdits();
     embedVideo();
     embedCarousel();
+    embedDesktopCarousel();
     embedTestimonials();
     if (ticks > 120) clearInterval(iv); // ~18s of insurance against re-render
   }
